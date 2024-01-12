@@ -171,7 +171,7 @@ const ImageEditor = () => {
 
             {Object.keys(labelDetails).map((position) => (
               <div
-                className={"tag " + position}
+                className={"label " + position}
                 style={{
                   justifyContent:
                     labelDetails[position as keyof typeof labelDetails]

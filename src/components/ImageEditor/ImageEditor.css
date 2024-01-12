@@ -107,11 +107,11 @@
       color: rgba(60, 60, 63, 0.45);
 
       img {
-        max-width: calc(70vw - var(--padding));
-        max-height: calc(70vh - var(--padding));
+        max-width: calc(65vw - var(--padding));
+        max-height: calc(80vh - var(--padding));
       }
 
-      .tag {
+      .label {
         position: absolute;
         display: flex;
         gap: 10px;
@@ -130,47 +130,47 @@
           }
         }
 
+        &.top,
+        &.bottom {
+          flex-direction: row;
+          height: var(--label-height);
+          width: calc(100% - var(--padding) * 2);
+        }
+        &.left,
+        &.right {
+          width: calc(var(--fancy-image-height) - var(--padding) * 2);
+          height: var(--label-height);
+        }
+
+        &.top {
+          left: var(--padding);
+          top: var(--padding);
+          transform: translateY(-100%);
+        }
+
+        &.left {
+          transform-origin: top left;
+          left: calc(var(--padding) - var(--label-height));
+          bottom: calc(var(--padding) - var(--label-height));
+          transform: rotate(-90deg);
+        }
+
+        &.bottom {
+          right: var(--padding);
+          top: calc(100% - var(--padding));
+        }
+
+        &.right {
+          transform-origin: bottom left;
+          left: calc(100% - var(--padding));
+          top: calc(var(--padding) - var(--label-height));
+          transform: rotate(90deg);
+        }
+
         .setting {
           font-weight: 800;
           opacity: 0.8;
         }
-      }
-
-      .tag.top,
-      .tag.bottom {
-        flex-direction: row;
-        height: var(--label-height);
-        width: calc(100% - var(--padding) * 2);
-      }
-      .tag.left,
-      .tag.right {
-        width: calc(var(--fancy-image-height) - var(--padding) * 2);
-        height: var(--label-height);
-      }
-
-      .tag.top {
-        left: var(--padding);
-        top: var(--padding);
-        transform: translateY(-100%);
-      }
-
-      .tag.left {
-        transform-origin: top left;
-        left: calc(var(--padding) - var(--label-height));
-        bottom: calc(var(--padding) - var(--label-height));
-        transform: rotate(-90deg);
-      }
-
-      .tag.bottom {
-        right: var(--padding);
-        top: calc(100% - var(--padding));
-      }
-
-      .tag.right {
-        transform-origin: bottom left;
-        left: calc(100% - var(--padding));
-        top: calc(var(--padding) - var(--label-height));
-        transform: rotate(90deg);
       }
     }
   }
