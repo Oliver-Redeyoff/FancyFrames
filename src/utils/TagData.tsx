@@ -32,7 +32,7 @@ export function GetTags(imageInfo: ImageInfo): Tags {
     },
     Date: {
       icon: <CalendarIcon />,
-      content: [<span>{imageInfo.date?.format("D - M - YYYY")}</span>],
+      content: [<span>{imageInfo.date?.format("ddd, Do MMM YYYY")}</span>],
     },
     Label: {
       icon: <TagIcon />,

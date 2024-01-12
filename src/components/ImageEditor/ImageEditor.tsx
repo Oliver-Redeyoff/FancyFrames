@@ -1,16 +1,11 @@
 import "./ImageEditor.css";
 
-import {
-  TagIcon,
-  CameraIcon,
-  CalendarIcon,
-  GlobeAltIcon,
-} from "@heroicons/react/24/outline";
-
 import { useState, useRef, useEffect } from "react";
 import { toPng } from "html-to-image";
-import EXIF, { getTag } from "exif-js";
+import EXIF from "exif-js";
 import moment from "moment";
+
+import { ArrowUpTrayIcon } from "@heroicons/react/24/outline";
 
 import { ImageInfo, LabelInfo } from "../../utils/Types";
 import { GetTags } from "../../utils/TagData";
@@ -32,15 +27,15 @@ const ImageEditor = () => {
   const fancyImageRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    console.log(ImageInfo);
-  }, [ImageInfo]);
-
-  useEffect(() => {
     if (fancyImageRef.current) {
       console.log(fancyImageRef.current.style);
       fancyImageRef.current.style.setProperty(
         "--fancy-image-height",
         fancyImageRef.current?.clientHeight + "px"
+      );
+      fancyImageRef.current.style.setProperty(
+        "--fancy-image-width",
+        fancyImageRef.current?.clientWidth + "px"
       );
     }
   }, [fancyImageRef.current?.clientHeight]);
@@ -109,8 +104,30 @@ const ImageEditor = () => {
 
   return (
     <div className="image-editor">
-      {selectedImage && (
-        <div className="fancy-image-container">
+      <div className="settings-container">
+        <div className="settings">
+          <h1>Fancy Frames</h1>
+          <button onClick={() => setSelectedImage(null)}>Remove</button>
+          <button onClick={() => htmlToImageConvert()}>Download</button>
+        </div>
+      </div>
+
+      <div className="fancy-image-container">
+        {!selectedImage && (
+          <div className="image-upload">
+            <div className="upload-prompt">
+              <ArrowUpTrayIcon />
+              <div>Upload image</div>
+            </div>
+            <input
+              type="file"
+              accept=".jpg, .png, .heif, .heic"
+              onChange={handleChange}
+            />
+          </div>
+        )}
+
+        {selectedImage && (
           <div ref={fancyImageRef} className="fancy-image">
             <img src={URL.createObjectURL(selectedImage)} />
 
@@ -135,78 +152,9 @@ const ImageEditor = () => {
                 ].content.map((element) => element)}
               </div>
             ))}
-
-            {/* <div
-              className="tag top"
-              style={{ justifyContent: labelDetails.top.alignment }}
-            >
-              <div className="icon ">
-                {GetTags(ImageInfo)[labelDetails.top.type].icon}
-              </div>
-              <span>
-                {ImageInfo.cameraMake} {ImageInfo.cameraModel}
-              </span>
-              <div style={{ width: "10px" }} />
-              <span>
-                <span className="setting">SS </span>
-                {ImageInfo.shutterSpeed}
-              </span>
-              <span>
-                <span className="setting">A </span>
-                {ImageInfo.aperture}
-              </span>
-              <span>
-                <span className="setting">ISO </span>
-                {ImageInfo.ISO}
-              </span>
-            </div>
-
-            <div
-              className="tag right"
-              style={{ justifyContent: labelDetails.right.alignment }}
-            >
-              <div className="icon">
-                <CalendarIcon />
-              </div>
-              <span>{ImageInfo.date?.format("D - M - YYYY")}</span>
-            </div>
-
-            <div
-              className="tag bottom"
-              style={{ justifyContent: labelDetails.bottom.alignment }}
-            >
-              <div className="icon">
-                <TagIcon />
-              </div>
-              <span>Green sand beach</span>
-            </div>
-
-            <div
-              className="tag left"
-              style={{ justifyContent: labelDetails.left.alignment }}
-            >
-              <div className="icon">
-                <GlobeAltIcon />
-              </div>
-              <span>
-                {ImageInfo.latitude} {ImageInfo.longitude}
-              </span>
-            </div> */}
           </div>
-        </div>
-      )}
-
-      <br />
-      <br />
-
-      <button onClick={() => setSelectedImage(null)}>Remove</button>
-      <button onClick={() => htmlToImageConvert()}>Download</button>
-
-      <input
-        type="file"
-        accept=".jpg, .png, .heif, .heic"
-        onChange={handleChange}
-      />
+        )}
+      </div>
     </div>
   );
 };

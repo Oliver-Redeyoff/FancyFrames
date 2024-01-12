@@ -6,7 +6,7 @@ import ImageEditor from "./components/ImageEditor/ImageEditor";
 
 function App() {
   return (
-    <div className="App">
+    <div className="app">
       <ImageEditor />
     </div>
   );

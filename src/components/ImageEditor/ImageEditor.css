@@ -1,23 +1,87 @@
 .image-editor {
-  display: inline-block;
-  margin: 20px;
+  display: flex;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  align-items: stretch;
+
+  .settings-container {
+    position: relative;
+    padding: 20px;
+    width: 20vw;
+  }
+
+  .settings {
+    border-radius: 20px;
+    padding: 30px 40px;
+    background-color: grey;
+    height: 100%;
+    box-sizing: border-box;
+
+    h1 {
+      margin: 0px;
+      margin-bottom: 20px;
+    }
+  }
 
   .fancy-image-container {
-    color: rgba(60, 60, 63, 0.45);
+    /* background-color: red; */
+    display: flex;
+    align-items: center;
+    justify-content: center;
     position: relative;
+    color: rgba(60, 60, 63, 0.45);
+    flex-grow: 1;
+    padding: 20px;
+    box-sizing: border-box;
+
+    .image-upload {
+      position: relative;
+      width: 100%;
+      height: 100%;
+
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.5);
+      }
+
+      .upload-prompt {
+        display: flex;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+        transition: all 0.3s;
+
+        svg {
+          height: 30px;
+        }
+      }
+
+      input {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+      }
+    }
 
     .fancy-image {
+      --fancy-image-width: 100px;
       --fancy-image-height: 100px;
-      --padding: 40px;
-      --tag-height: 20px;
-      display: block;
+      --padding: 50px;
+      --label-height: 20px;
+      position: relative;
+      display: inline-block;
       padding: var(--padding);
       background-color: white;
       box-sizing: border-box;
 
       img {
-        display: block;
-        height: 800px;
+        max-width: calc(75vw - var(--padding));
+        max-height: calc(75vh - var(--padding));
       }
 
       .tag {
@@ -27,6 +91,7 @@
         align-items: center;
         box-sizing: border-box;
         transition: all 0.2s;
+        font-size: calc(var(--label-height) / 1.4);
 
         .icon {
           height: 80%;
@@ -46,13 +111,13 @@
       .tag.top,
       .tag.bottom {
         flex-direction: row;
-        height: var(--tag-height);
+        height: var(--label-height);
         width: calc(100% - var(--padding) * 2);
       }
       .tag.left,
       .tag.right {
         width: calc(var(--fancy-image-height) - var(--padding) * 2);
-        height: var(--tag-height);
+        height: var(--label-height);
       }
 
       .tag.top {
@@ -63,8 +128,8 @@
 
       .tag.left {
         transform-origin: top left;
-        left: calc(var(--padding) - var(--tag-height));
-        bottom: calc(var(--padding) - var(--tag-height));
+        left: calc(var(--padding) - var(--label-height));
+        bottom: calc(var(--padding) - var(--label-height));
         transform: rotate(-90deg);
       }
 
@@ -76,7 +141,7 @@
       .tag.right {
         transform-origin: bottom left;
         left: calc(100% - var(--padding));
-        top: calc(var(--padding) - var(--tag-height));
+        top: calc(var(--padding) - var(--label-height));
         transform: rotate(90deg);
       }
     }
