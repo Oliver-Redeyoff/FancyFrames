@@ -1,5 +1,84 @@
-.fancy-image {
+.image-editor {
   display: inline-block;
-  padding: 50px;
-  background-color: red;
+  margin: 20px;
+
+  .fancy-image-container {
+    color: rgba(60, 60, 63, 0.45);
+    position: relative;
+
+    .fancy-image {
+      --fancy-image-height: 100px;
+      --padding: 40px;
+      --tag-height: 20px;
+      display: block;
+      padding: var(--padding);
+      background-color: white;
+      box-sizing: border-box;
+
+      img {
+        display: block;
+        height: 800px;
+      }
+
+      .tag {
+        position: absolute;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        box-sizing: border-box;
+        transition: all 0.2s;
+
+        .icon {
+          height: 80%;
+
+          svg {
+            height: 100%;
+            stroke-width: 2.5px;
+          }
+        }
+
+        .setting {
+          font-weight: 800;
+          opacity: 0.8;
+        }
+      }
+
+      .tag.top,
+      .tag.bottom {
+        flex-direction: row;
+        height: var(--tag-height);
+        width: calc(100% - var(--padding) * 2);
+      }
+      .tag.left,
+      .tag.right {
+        width: calc(var(--fancy-image-height) - var(--padding) * 2);
+        height: var(--tag-height);
+      }
+
+      .tag.top {
+        left: var(--padding);
+        top: var(--padding);
+        transform: translateY(-100%);
+      }
+
+      .tag.left {
+        transform-origin: top left;
+        left: calc(var(--padding) - var(--tag-height));
+        bottom: calc(var(--padding) - var(--tag-height));
+        transform: rotate(-90deg);
+      }
+
+      .tag.bottom {
+        right: var(--padding);
+        top: calc(100% - var(--padding));
+      }
+
+      .tag.right {
+        transform-origin: bottom left;
+        left: calc(100% - var(--padding));
+        top: calc(var(--padding) - var(--tag-height));
+        transform: rotate(90deg);
+      }
+    }
+  }
 }
