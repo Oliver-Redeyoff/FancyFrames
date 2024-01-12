@@ -5,7 +5,12 @@ import { toPng } from "html-to-image";
 import EXIF from "exif-js";
 import moment from "moment";
 
-import { ArrowUpTrayIcon } from "@heroicons/react/24/outline";
+import {
+  ArrowUpTrayIcon,
+  Bars3BottomLeftIcon,
+  Bars3Icon,
+  Bars3BottomRightIcon,
+} from "@heroicons/react/24/outline";
 
 import { ImageInfo, LabelInfo } from "../../utils/Types";
 import { GetTags } from "../../utils/TagData";
@@ -107,6 +112,39 @@ const ImageEditor = () => {
       <div className="settings-container">
         <div className="settings">
           <h1>Fancy Frames</h1>
+
+          {Object.keys(labelDetails).map((position) => (
+            <div key={position} className="label-settings">
+              <h2>{position}</h2>
+              <div className="alignments">
+                {["start", "center", "end"].map((alignment) => (
+                  <div
+                    key={alignment}
+                    className={
+                      "alignment" +
+                      (labelDetails[position as keyof typeof labelDetails]
+                        .alignment == alignment
+                        ? " selected"
+                        : "")
+                    }
+                    onClick={() => {
+                      var newDetails = { ...labelDetails };
+                      newDetails[
+                        position as keyof typeof labelDetails
+                      ].alignment = alignment as "start" | "center" | "end";
+                      console.log(newDetails);
+                      setLabelDetails(newDetails);
+                    }}
+                  >
+                    {alignment == "start" && <Bars3BottomLeftIcon />}
+                    {alignment == "center" && <Bars3Icon />}
+                    {alignment == "end" && <Bars3BottomRightIcon />}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+
           <button onClick={() => setSelectedImage(null)}>Remove</button>
           <button onClick={() => htmlToImageConvert()}>Download</button>
         </div>
