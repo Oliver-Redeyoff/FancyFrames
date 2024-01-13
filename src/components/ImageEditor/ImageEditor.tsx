@@ -12,12 +12,12 @@ import {
   Bars3BottomRightIcon,
 } from "@heroicons/react/24/outline";
 
-import { ImageInfo, LabelInfo } from "../../utils/Types";
+import { ImageInfo, LabelInfo, Tags } from "../../utils/Types";
 import { GetTags } from "../../utils/TagData";
 
 const ImageEditor = () => {
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [ImageInfo, setImageInfo] = useState<ImageInfo>({} as ImageInfo);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [imageInfo, setImageInfo] = useState<ImageInfo>({} as ImageInfo);
   const [labelDetails, setLabelDetails] = useState<{
     top: LabelInfo;
     right: LabelInfo;
@@ -30,6 +30,10 @@ const ImageEditor = () => {
     left: { type: "Coordinates", alignment: "start" },
   });
   const fancyImageRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    console.log(imageInfo);
+  }, [imageInfo]);
 
   useEffect(() => {
     if (fancyImageRef.current) {
@@ -63,23 +67,32 @@ const ImageEditor = () => {
   }
 
   function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
-    if (event.target.files) {
+    if (event.target.files && event.target.files[0]) {
       const file = event.target.files[0];
+      setSelectedImage(URL.createObjectURL(file));
 
       EXIF.getData(
         event.target.files[0] as unknown as string,
         function (this: any) {
           var exifData = EXIF.getAllTags(this);
           if (exifData) {
-            console.log(exifData);
             console.log(Date.parse(exifData["DateTime"]));
 
+            // shutterSpeed
+            const exposureTime = exifData["ExposureTime"];
+            var shutterSpeed = "";
+            if (exposureTime) {
+              shutterSpeed = `${exposureTime.numerator}/${exposureTime.denominator}`;
+            }
+
+            // latitude
             const latitudeCoords = exifData["GPSLatitude"];
             var latitude = "";
             if (latitudeCoords) {
               latitude = `${latitudeCoords[0]}° ${latitudeCoords[1]}' ${latitudeCoords[2]}" ${exifData["GPSLatitudeRef"]}`;
             }
 
+            // longitude
             const longitudeCoords = exifData["GPSLongitude"];
             var longitude = "";
             if (longitudeCoords) {
@@ -90,8 +103,8 @@ const ImageEditor = () => {
               label: "",
               cameraMake: exifData["Make"],
               cameraModel: exifData["Model"],
-              aperture: exifData["FNumber"].numerator,
-              shutterSpeed: `${exifData["ExposureTime"].numerator}/${exifData["ExposureTime"].denominator}`,
+              aperture: exifData["FNumber"]?.numerator,
+              shutterSpeed: shutterSpeed,
               ISO: exifData["ISOSpeedRatings"],
               date: moment(exifData["DateTime"], "YYYY:MM:DD hh:mm:ss"),
               latitude: latitude,
@@ -102,8 +115,6 @@ const ImageEditor = () => {
           }
         }
       );
-
-      setSelectedImage(event.target.files[0]);
     }
   }
 
@@ -115,32 +126,53 @@ const ImageEditor = () => {
 
           {Object.keys(labelDetails).map((position) => (
             <div key={position} className="label-settings">
-              <h2>{position}</h2>
-              <div className="alignments">
-                {["start", "center", "end"].map((alignment) => (
-                  <div
-                    key={alignment}
-                    className={
-                      "alignment" +
-                      (labelDetails[position as keyof typeof labelDetails]
-                        .alignment == alignment
-                        ? " selected"
-                        : "")
-                    }
-                    onClick={() => {
-                      var newDetails = { ...labelDetails };
-                      newDetails[
-                        position as keyof typeof labelDetails
-                      ].alignment = alignment as "start" | "center" | "end";
-                      console.log(newDetails);
-                      setLabelDetails(newDetails);
-                    }}
-                  >
-                    {alignment == "start" && <Bars3BottomLeftIcon />}
-                    {alignment == "center" && <Bars3Icon />}
-                    {alignment == "end" && <Bars3BottomRightIcon />}
-                  </div>
-                ))}
+              <h2>{position} label</h2>
+
+              <div className="label-settings-body">
+                <label>Tag type</label>
+                <select
+                  value={
+                    labelDetails[position as keyof typeof labelDetails].type
+                  }
+                  onChange={(e) => {
+                    var newDetails = { ...labelDetails };
+                    newDetails[position as keyof typeof labelDetails].type = e
+                      .target.value as keyof Tags;
+                    setLabelDetails(newDetails);
+                  }}
+                >
+                  {Object.keys(GetTags(imageInfo)).map((tagType) => (
+                    <option value={tagType}>{tagType}</option>
+                  ))}
+                </select>
+
+                <label>Tag alignment</label>
+                <div className="alignments">
+                  {["start", "center", "end"].map((alignment) => (
+                    <div
+                      key={alignment}
+                      className={
+                        "alignment" +
+                        (labelDetails[position as keyof typeof labelDetails]
+                          .alignment == alignment
+                          ? " selected"
+                          : "")
+                      }
+                      onClick={() => {
+                        var newDetails = { ...labelDetails };
+                        newDetails[
+                          position as keyof typeof labelDetails
+                        ].alignment = alignment as "start" | "center" | "end";
+                        console.log(newDetails);
+                        setLabelDetails(newDetails);
+                      }}
+                    >
+                      {alignment == "start" && <Bars3BottomLeftIcon />}
+                      {alignment == "center" && <Bars3Icon />}
+                      {alignment == "end" && <Bars3BottomRightIcon />}
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           ))}
@@ -167,10 +199,11 @@ const ImageEditor = () => {
 
         {selectedImage && (
           <div ref={fancyImageRef} className="fancy-image">
-            <img src={URL.createObjectURL(selectedImage)} />
+            <img src={selectedImage} />
 
             {Object.keys(labelDetails).map((position) => (
               <div
+                key={position}
                 className={"label " + position}
                 style={{
                   justifyContent:
@@ -180,12 +213,12 @@ const ImageEditor = () => {
               >
                 <div className="icon ">
                   {
-                    GetTags(ImageInfo)[
+                    GetTags(imageInfo)[
                       labelDetails[position as keyof typeof labelDetails].type
                     ].icon
                   }
                 </div>
-                {GetTags(ImageInfo)[
+                {GetTags(imageInfo)[
                   labelDetails[position as keyof typeof labelDetails].type
                 ].content.map((element) => element)}
               </div>
