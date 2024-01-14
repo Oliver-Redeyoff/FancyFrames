@@ -239,21 +239,26 @@ const ImageEditor = () => {
                   }
                 >
                   <div className="mt-4">Tag type</div>
-                  <select
-                    value={
-                      labelSettings[position as keyof typeof labelSettings].type
-                    }
-                    onChange={(e) => {
-                      var newDetails = { ...labelSettings };
-                      newDetails[position as keyof typeof labelSettings].type =
-                        e.target.value as keyof Tags;
-                      setLabelSettings(newDetails);
-                    }}
-                  >
-                    {Object.keys(GetTags(imageInfo)).map((tagType) => (
-                      <option value={tagType}>{tagType}</option>
-                    ))}
-                  </select>
+                  <div className="bg-neutral-700 p-1 ps-3 pe-3 rounded-lg">
+                    <select
+                      className="w-full bg-transparent focus:border-none outline-none"
+                      value={
+                        labelSettings[position as keyof typeof labelSettings]
+                          .type
+                      }
+                      onChange={(e) => {
+                        var newDetails = { ...labelSettings };
+                        newDetails[
+                          position as keyof typeof labelSettings
+                        ].type = e.target.value as keyof Tags;
+                        setLabelSettings(newDetails);
+                      }}
+                    >
+                      {Object.keys(GetTags(imageInfo)).map((tagType) => (
+                        <option value={tagType}>{tagType}</option>
+                      ))}
+                    </select>
+                  </div>
 
                   <div className="mt-2">Tag alignment</div>
                   <div className="alignments">
