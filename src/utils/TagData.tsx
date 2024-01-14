@@ -9,6 +9,10 @@ import { ImageInfo, Tags } from "./Types";
 
 export function GetTags(imageInfo: ImageInfo): Tags {
   return {
+    Nothing: {
+      icon: <></>,
+      content: [<></>],
+    },
     Camera: {
       icon: <CameraIcon />,
       content: [

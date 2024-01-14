@@ -6,14 +6,21 @@ import EXIF from "exif-js";
 import moment from "moment";
 
 import {
+  AdjustmentsHorizontalIcon,
+  ArrowsPointingInIcon,
+  ArrowsPointingOutIcon,
+  PhotoIcon,
   ArrowUpTrayIcon,
+  ArrowDownTrayIcon,
   Bars3BottomLeftIcon,
   Bars3Icon,
   Bars3BottomRightIcon,
   ChevronDownIcon,
+  XMarkIcon,
+  TagIcon,
 } from "@heroicons/react/24/outline";
 
-import { ImageInfo, LabelInfo, Tags } from "../../utils/Types";
+import { ImageInfo, ImageSettings, LabelInfo, Tags } from "../../utils/Types";
 import { GetTags } from "../../utils/TagData";
 
 const ImageEditor = () => {
@@ -22,18 +29,11 @@ const ImageEditor = () => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [imageInfo, setImageInfo] = useState<ImageInfo>({} as ImageInfo);
 
-  const [labelSettingsCollapsed, setLabelSettingsCollapsed] = useState<{
-    top: boolean;
-    right: boolean;
-    bottom: boolean;
-    left: boolean;
-  }>({
-    top: false,
-    right: true,
-    bottom: true,
-    left: true,
+  const [imageSettings, setImageSettings] = useState<ImageSettings>({
+    borderRadius: 0,
   });
-  const [labelDetails, setLabelDetails] = useState<{
+
+  const [labelSettings, setLabelSettings] = useState<{
     top: LabelInfo;
     right: LabelInfo;
     bottom: LabelInfo;
@@ -43,6 +43,17 @@ const ImageEditor = () => {
     right: { type: "Date", alignment: "start" },
     bottom: { type: "Title", alignment: "start" },
     left: { type: "Coordinates", alignment: "start" },
+  });
+  const [labelSettingsCollapsed, setLabelSettingsCollapsed] = useState<{
+    top: boolean;
+    right: boolean;
+    bottom: boolean;
+    left: boolean;
+  }>({
+    top: true,
+    right: true,
+    bottom: true,
+    left: true,
   });
 
   useEffect(() => {
@@ -63,7 +74,7 @@ const ImageEditor = () => {
     }
   }, [fancyImageRef.current?.clientHeight]);
 
-  function htmlToImageConvert() {
+  function downloadFancyImage() {
     if (fancyImageRef != null) {
       console.log(EXIF.getAllTags(selectedImage));
 
@@ -80,7 +91,7 @@ const ImageEditor = () => {
     }
   }
 
-  function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
+  function handleFileInput(event: React.ChangeEvent<HTMLInputElement>) {
     if (event.target.files && event.target.files[0]) {
       const file = event.target.files[0];
       setSelectedImage(URL.createObjectURL(file));
@@ -90,7 +101,7 @@ const ImageEditor = () => {
         function (this: any) {
           var exifData = EXIF.getAllTags(this);
           if (exifData) {
-            console.log(Date.parse(exifData["DateTime"]));
+            console.log(exifData);
 
             // shutterSpeed
             const exposureTime = exifData["ExposureTime"];
@@ -114,7 +125,7 @@ const ImageEditor = () => {
             }
 
             setImageInfo({
-              label: "",
+              label: exifData["ImageDescription"],
               cameraMake: exifData["Make"],
               cameraModel: exifData["Model"],
               aperture: exifData["FNumber"]?.numerator,
@@ -133,148 +144,216 @@ const ImageEditor = () => {
   }
 
   return (
-    <div className="image-editor">
+    <div className="image-editor bg-neutral-900 font-sans">
       {/* SETTINGS */}
       <div className="settings-container">
         <div className="settings">
-          <h1 className="text-3xl">Fancy Frames</h1>
+          <h1 className="flex items-center gap-3 text-2xl font-bold mb-10">
+            <div className="w-9 text-red-400">
+              <PhotoIcon />
+            </div>
+            Fancy Frames
+          </h1>
+
+          <h2 className="flex gap-2 items-center text-xl font-bold mb-4">
+            <div className="w-6">
+              <ArrowsPointingInIcon />
+            </div>
+            Image settings
+          </h2>
+
+          <div className="setting-section-body">
+            <div className="mb-2">Image border radius</div>
+            <input
+              className="w-full"
+              type="range"
+              min="0"
+              max="50"
+              value={imageSettings.borderRadius}
+              onChange={(e) => {
+                setImageSettings({
+                  ...imageSettings,
+                  borderRadius: parseInt(e.target.value),
+                });
+              }}
+            />
+          </div>
+
+          <h2 className="flex gap-2 items-center text-xl font-bold mb-4">
+            <div className="w-6">
+              <ArrowsPointingOutIcon />
+            </div>
+            Frame settings
+          </h2>
+          <div className="setting-section-body"></div>
 
           {/* LABEL SETTINGS */}
-          {Object.keys(labelDetails).map((position) => (
-            <div key={position} className="label-settings">
-              <h2
-                onClick={() => {
-                  var newLabelSettingsCollapsed = { ...labelSettingsCollapsed };
-                  newLabelSettingsCollapsed[
-                    position as keyof typeof labelSettingsCollapsed
-                  ] =
-                    !newLabelSettingsCollapsed[
+          <h2 className="flex gap-2 items-center text-xl font-bold mb-4">
+            <div className="w-6">
+              <TagIcon />
+            </div>
+            Label settings
+          </h2>
+          <div className="setting-section-body">
+            {Object.keys(labelSettings).map((position) => (
+              <div key={position} className="label-settings mb-5">
+                <h3
+                  className="border-l-red-400 border-l-2 border-dashed flex items-center justify-center cursor-pointer ps-2"
+                  onClick={() => {
+                    var newLabelSettingsCollapsed = {
+                      ...labelSettingsCollapsed,
+                    };
+                    newLabelSettingsCollapsed[
                       position as keyof typeof labelSettingsCollapsed
-                    ];
-                  setLabelSettingsCollapsed(newLabelSettingsCollapsed);
-                }}
-              >
-                <span>{position} label</span>
-                <div className="flex-filler"></div>
-                <div
-                  className={
-                    labelSettingsCollapsed[
-                      position as keyof typeof labelSettingsCollapsed
-                    ]
-                      ? "rotate-180"
-                      : ""
-                  }
-                >
-                  <ChevronDownIcon />
-                </div>
-              </h2>
-
-              <div
-                className={
-                  "label-settings-body " +
-                  (labelSettingsCollapsed[
-                    position as keyof typeof labelSettingsCollapsed
-                  ]
-                    ? "collapsed"
-                    : "")
-                }
-              >
-                <label>Tag type</label>
-                <select
-                  value={
-                    labelDetails[position as keyof typeof labelDetails].type
-                  }
-                  onChange={(e) => {
-                    var newDetails = { ...labelDetails };
-                    newDetails[position as keyof typeof labelDetails].type = e
-                      .target.value as keyof Tags;
-                    setLabelDetails(newDetails);
+                    ] =
+                      !newLabelSettingsCollapsed[
+                        position as keyof typeof labelSettingsCollapsed
+                      ];
+                    setLabelSettingsCollapsed(newLabelSettingsCollapsed);
                   }}
                 >
-                  {Object.keys(GetTags(imageInfo)).map((tagType) => (
-                    <option value={tagType}>{tagType}</option>
-                  ))}
-                </select>
+                  <span>{position} label</span>
+                  <div className="flex-filler"></div>
+                  <div
+                    className={
+                      "w-4 transition-all duration-300" +
+                      (labelSettingsCollapsed[
+                        position as keyof typeof labelSettingsCollapsed
+                      ]
+                        ? ""
+                        : " rotate-180")
+                    }
+                  >
+                    <ChevronDownIcon />
+                  </div>
+                </h3>
 
-                <label>Tag alignment</label>
-                <div className="alignments">
-                  {["start", "center", "end"].map((alignment) => (
-                    <div
-                      key={alignment}
-                      className={
-                        "alignment" +
-                        (labelDetails[position as keyof typeof labelDetails]
-                          .alignment == alignment
-                          ? " selected"
-                          : "")
-                      }
-                      onClick={() => {
-                        var newDetails = { ...labelDetails };
-                        newDetails[
-                          position as keyof typeof labelDetails
-                        ].alignment = alignment as "start" | "center" | "end";
-                        console.log(newDetails);
-                        setLabelDetails(newDetails);
-                      }}
-                    >
-                      {alignment == "start" && <Bars3BottomLeftIcon />}
-                      {alignment == "center" && <Bars3Icon />}
-                      {alignment == "end" && <Bars3BottomRightIcon />}
-                    </div>
-                  ))}
+                <div
+                  className={
+                    "label-settings-body " +
+                    (labelSettingsCollapsed[
+                      position as keyof typeof labelSettingsCollapsed
+                    ]
+                      ? "collapsed"
+                      : "")
+                  }
+                >
+                  <div className="mt-4">Tag type</div>
+                  <select
+                    value={
+                      labelSettings[position as keyof typeof labelSettings].type
+                    }
+                    onChange={(e) => {
+                      var newDetails = { ...labelSettings };
+                      newDetails[position as keyof typeof labelSettings].type =
+                        e.target.value as keyof Tags;
+                      setLabelSettings(newDetails);
+                    }}
+                  >
+                    {Object.keys(GetTags(imageInfo)).map((tagType) => (
+                      <option value={tagType}>{tagType}</option>
+                    ))}
+                  </select>
+
+                  <div className="mt-2">Tag alignment</div>
+                  <div className="alignments">
+                    {["start", "center", "end"].map((alignment) => (
+                      <div
+                        key={alignment}
+                        className={
+                          "alignment" +
+                          (labelSettings[position as keyof typeof labelSettings]
+                            .alignment == alignment
+                            ? " selected"
+                            : "")
+                        }
+                        onClick={() => {
+                          var newDetails = { ...labelSettings };
+                          newDetails[
+                            position as keyof typeof labelSettings
+                          ].alignment = alignment as "start" | "center" | "end";
+                          console.log(newDetails);
+                          setLabelSettings(newDetails);
+                        }}
+                      >
+                        {alignment == "start" && <Bars3BottomLeftIcon />}
+                        {alignment == "center" && <Bars3Icon />}
+                        {alignment == "end" && <Bars3BottomRightIcon />}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-
-          <button onClick={() => setSelectedImage(null)}>Remove</button>
-          <button onClick={() => htmlToImageConvert()}>Download</button>
+            ))}
+          </div>
         </div>
       </div>
 
       {/* FANCY IMAGE */}
       <div className="fancy-image-container">
         {!selectedImage && (
-          <div className="image-upload">
+          <div className="image-upload hover:bg-neutral-800">
             <div className="upload-prompt">
-              <ArrowUpTrayIcon />
+              <ArrowUpTrayIcon className="text-red-400" />
               <div>Upload image</div>
             </div>
             <input
               type="file"
               accept=".jpg, .png, .heif, .heic"
-              onChange={handleChange}
+              onChange={handleFileInput}
             />
           </div>
         )}
 
         {selectedImage && (
-          <div ref={fancyImageRef} className="fancy-image">
-            <img src={selectedImage} />
+          <>
+            <div
+              className="absolute top-8 right-8 bg-gray-700 p-3 box-content w-7 h-7 rounded-full cursor-pointer hover:scale-125 transition-all"
+              onClick={() => {
+                setSelectedImage(null);
+              }}
+            >
+              <XMarkIcon className="stroke-2 text-red-400" />
+            </div>
 
-            {Object.keys(labelDetails).map((position) => (
-              <div
-                key={position}
-                className={"label " + position}
-                style={{
-                  justifyContent:
-                    labelDetails[position as keyof typeof labelDetails]
-                      .alignment,
-                }}
-              >
-                <div className="icon ">
-                  {
-                    GetTags(imageInfo)[
-                      labelDetails[position as keyof typeof labelDetails].type
-                    ].icon
-                  }
+            <div
+              className="absolute bottom-8 right-8 bg-gray-700 p-3 box-content w-7 h-7 rounded-full cursor-pointer hover:scale-125 transition-all"
+              onClick={downloadFancyImage}
+            >
+              <ArrowDownTrayIcon className="stroke-2 text-emerald-500" />
+            </div>
+
+            <div ref={fancyImageRef} className="fancy-image">
+              <img
+                style={{ borderRadius: `${imageSettings.borderRadius}%` }}
+                src={selectedImage}
+              />
+
+              {Object.keys(labelSettings).map((position) => (
+                <div
+                  key={position}
+                  className={"label " + position}
+                  style={{
+                    justifyContent:
+                      labelSettings[position as keyof typeof labelSettings]
+                        .alignment,
+                  }}
+                >
+                  <div className="icon ">
+                    {
+                      GetTags(imageInfo)[
+                        labelSettings[position as keyof typeof labelSettings]
+                          .type
+                      ].icon
+                    }
+                  </div>
+                  {GetTags(imageInfo)[
+                    labelSettings[position as keyof typeof labelSettings].type
+                  ].content.map((element) => element)}
                 </div>
-                {GetTags(imageInfo)[
-                  labelDetails[position as keyof typeof labelDetails].type
-                ].content.map((element) => element)}
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          </>
         )}
       </div>
     </div>

@@ -29,30 +29,12 @@
         outline: 1px solid slategrey;
       }
 
-      h1 {
-        margin: 0px;
-        padding: 10px 20px;
+      .setting-section-body {
         margin-bottom: 40px;
-        border: 4px dashed var(--accent-color);
+        /* border: 1px solid red; */
       }
 
       .label-settings {
-        margin-bottom: 40px;
-
-        h2 {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          margin: 0px;
-          cursor: pointer;
-          border-left: 2px solid var(--accent-color);
-          padding-left: 10px;
-
-          svg {
-            width: 1rem;
-          }
-        }
-
         .label-settings-body {
           display: flex;
           flex-direction: column;
@@ -111,10 +93,6 @@
       height: 100%;
       border-radius: 20px;
       transition: all 0.2s;
-
-      &:hover {
-        background-color: rgba(255, 255, 255, 0.1);
-      }
 
       .upload-prompt {
         display: flex;

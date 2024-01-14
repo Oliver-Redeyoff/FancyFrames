@@ -10,12 +10,17 @@ export interface ImageInfo {
   longitude: string;
 }
 
+export interface ImageSettings {
+  borderRadius: number;
+}
+
 export interface TagInfo {
   icon: JSX.Element;
   content: JSX.Element[];
 }
 
 export interface Tags {
+  Nothing: TagInfo;
   Camera: TagInfo;
   Date: TagInfo;
   Coordinates: TagInfo;
