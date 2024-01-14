@@ -34,7 +34,7 @@ export function GetTags(imageInfo: ImageInfo): Tags {
       icon: <CalendarIcon />,
       content: [<span>{imageInfo.date?.format("ddd, Do MMM YYYY")}</span>],
     },
-    Label: {
+    Title: {
       icon: <TagIcon />,
       content: [<span>{imageInfo.label}</span>],
     },

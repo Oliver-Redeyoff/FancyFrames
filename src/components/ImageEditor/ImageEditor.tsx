@@ -10,14 +10,29 @@ import {
   Bars3BottomLeftIcon,
   Bars3Icon,
   Bars3BottomRightIcon,
+  ChevronDownIcon,
 } from "@heroicons/react/24/outline";
 
 import { ImageInfo, LabelInfo, Tags } from "../../utils/Types";
 import { GetTags } from "../../utils/TagData";
 
 const ImageEditor = () => {
+  const fancyImageRef = useRef<HTMLDivElement>(null);
+
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [imageInfo, setImageInfo] = useState<ImageInfo>({} as ImageInfo);
+
+  const [labelSettingsCollapsed, setLabelSettingsCollapsed] = useState<{
+    top: boolean;
+    right: boolean;
+    bottom: boolean;
+    left: boolean;
+  }>({
+    top: false,
+    right: true,
+    bottom: true,
+    left: true,
+  });
   const [labelDetails, setLabelDetails] = useState<{
     top: LabelInfo;
     right: LabelInfo;
@@ -26,10 +41,9 @@ const ImageEditor = () => {
   }>({
     top: { type: "Camera", alignment: "start" },
     right: { type: "Date", alignment: "start" },
-    bottom: { type: "Label", alignment: "start" },
+    bottom: { type: "Title", alignment: "start" },
     left: { type: "Coordinates", alignment: "start" },
   });
-  const fancyImageRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     console.log(imageInfo);
@@ -120,15 +134,51 @@ const ImageEditor = () => {
 
   return (
     <div className="image-editor">
+      {/* SETTINGS */}
       <div className="settings-container">
         <div className="settings">
-          <h1>Fancy Frames</h1>
+          <h1 className="text-3xl">Fancy Frames</h1>
 
+          {/* LABEL SETTINGS */}
           {Object.keys(labelDetails).map((position) => (
             <div key={position} className="label-settings">
-              <h2>{position} label</h2>
+              <h2
+                onClick={() => {
+                  var newLabelSettingsCollapsed = { ...labelSettingsCollapsed };
+                  newLabelSettingsCollapsed[
+                    position as keyof typeof labelSettingsCollapsed
+                  ] =
+                    !newLabelSettingsCollapsed[
+                      position as keyof typeof labelSettingsCollapsed
+                    ];
+                  setLabelSettingsCollapsed(newLabelSettingsCollapsed);
+                }}
+              >
+                <span>{position} label</span>
+                <div className="flex-filler"></div>
+                <div
+                  className={
+                    labelSettingsCollapsed[
+                      position as keyof typeof labelSettingsCollapsed
+                    ]
+                      ? "rotate-180"
+                      : ""
+                  }
+                >
+                  <ChevronDownIcon />
+                </div>
+              </h2>
 
-              <div className="label-settings-body">
+              <div
+                className={
+                  "label-settings-body " +
+                  (labelSettingsCollapsed[
+                    position as keyof typeof labelSettingsCollapsed
+                  ]
+                    ? "collapsed"
+                    : "")
+                }
+              >
                 <label>Tag type</label>
                 <select
                   value={
@@ -182,6 +232,7 @@ const ImageEditor = () => {
         </div>
       </div>
 
+      {/* FANCY IMAGE */}
       <div className="fancy-image-container">
         {!selectedImage && (
           <div className="image-upload">

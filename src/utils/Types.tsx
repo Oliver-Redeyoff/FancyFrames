@@ -19,7 +19,7 @@ export interface Tags {
   Camera: TagInfo;
   Date: TagInfo;
   Coordinates: TagInfo;
-  Label: TagInfo;
+  Title: TagInfo;
 }
 
 export interface LabelInfo {
