@@ -10,10 +10,6 @@ export interface ImageInfo {
   longitude: string;
 }
 
-export interface ImageSettings {
-  borderRadius: number;
-}
-
 export interface TagInfo {
   icon: JSX.Element;
   content: JSX.Element[];
@@ -30,4 +26,13 @@ export interface Tags {
 export interface LabelInfo {
   type: keyof Tags;
   alignment: "start" | "center" | "end";
+}
+
+export interface ImageSettings {
+  borderRadius: number;
+}
+
+export interface FrameSettings {
+  backgroundColor: string;
+  textColor: string;
 }

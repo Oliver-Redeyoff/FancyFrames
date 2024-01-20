@@ -6,7 +6,6 @@ import EXIF from "exif-js";
 import moment from "moment";
 
 import {
-  AdjustmentsHorizontalIcon,
   ArrowsPointingInIcon,
   ArrowsPointingOutIcon,
   PhotoIcon,
@@ -20,7 +19,13 @@ import {
   TagIcon,
 } from "@heroicons/react/24/outline";
 
-import { ImageInfo, ImageSettings, LabelInfo, Tags } from "../../utils/Types";
+import {
+  ImageInfo,
+  LabelInfo,
+  Tags,
+  ImageSettings,
+  FrameSettings,
+} from "../../utils/Types";
 import { GetTags } from "../../utils/TagData";
 
 const ImageEditor = () => {
@@ -31,6 +36,11 @@ const ImageEditor = () => {
 
   const [imageSettings, setImageSettings] = useState<ImageSettings>({
     borderRadius: 0,
+  });
+
+  const [frameSettings, setFrameSettings] = useState<FrameSettings>({
+    backgroundColor: "#ffffff",
+    textColor: "#A7A7A8",
   });
 
   const [labelSettings, setLabelSettings] = useState<{
@@ -155,7 +165,7 @@ const ImageEditor = () => {
             Fancy Frames
           </h1>
 
-          <h2 className="flex gap-2 items-center text-xl font-bold mb-4">
+          <h2 className="setting-section-name">
             <div className="w-6">
               <ArrowsPointingInIcon />
             </div>
@@ -163,7 +173,7 @@ const ImageEditor = () => {
           </h2>
 
           <div className="setting-section-body">
-            <div className="mb-2">Image border radius</div>
+            <div className="setting-label">Image border radius</div>
             <input
               className="w-full"
               type="range"
@@ -179,16 +189,42 @@ const ImageEditor = () => {
             />
           </div>
 
-          <h2 className="flex gap-2 items-center text-xl font-bold mb-4">
+          <h2 className="setting-section-name">
             <div className="w-6">
               <ArrowsPointingOutIcon />
             </div>
             Frame settings
           </h2>
-          <div className="setting-section-body"></div>
+          <div className="setting-section-body">
+            <div className="setting-label">Frame background color</div>
+            <input
+              className="w-full bg-transparent"
+              type="color"
+              value={frameSettings.backgroundColor}
+              onChange={(e) => {
+                setFrameSettings({
+                  ...frameSettings,
+                  backgroundColor: e.target.value,
+                });
+              }}
+            />
+
+            <div className="setting-label mt-4">Frame text color</div>
+            <input
+              className="w-full bg-transparent"
+              type="color"
+              value={frameSettings.textColor}
+              onChange={(e) => {
+                setFrameSettings({
+                  ...frameSettings,
+                  textColor: e.target.value,
+                });
+              }}
+            />
+          </div>
 
           {/* LABEL SETTINGS */}
-          <h2 className="flex gap-2 items-center text-xl font-bold mb-4">
+          <h2 className="setting-section-name">
             <div className="w-6">
               <TagIcon />
             </div>
@@ -198,7 +234,7 @@ const ImageEditor = () => {
             {Object.keys(labelSettings).map((position) => (
               <div key={position} className="label-settings mb-5">
                 <h3
-                  className="border-l-red-400 border-l-2 border-dashed flex items-center justify-center cursor-pointer ps-2"
+                  className="setting-label flex items-center justify-center cursor-pointer"
                   onClick={() => {
                     var newLabelSettingsCollapsed = {
                       ...labelSettingsCollapsed,
@@ -238,7 +274,7 @@ const ImageEditor = () => {
                       : "")
                   }
                 >
-                  <div className="mt-4">Tag type</div>
+                  <div className="mt-2 setting-label">Tag type</div>
                   <div className="bg-neutral-700 p-1 ps-3 pe-3 rounded-lg">
                     <select
                       className="w-full bg-transparent focus:border-none outline-none"
@@ -260,7 +296,7 @@ const ImageEditor = () => {
                     </select>
                   </div>
 
-                  <div className="mt-2">Tag alignment</div>
+                  <div className="mt-4 setting-label">Tag alignment</div>
                   <div className="alignments">
                     {["start", "center", "end"].map((alignment) => (
                       <div
@@ -328,7 +364,14 @@ const ImageEditor = () => {
               <ArrowDownTrayIcon className="stroke-2 text-emerald-500" />
             </div>
 
-            <div ref={fancyImageRef} className="fancy-image">
+            <div
+              ref={fancyImageRef}
+              className="fancy-image"
+              style={{
+                backgroundColor: frameSettings.backgroundColor,
+                color: frameSettings.textColor,
+              }}
+            >
               <img
                 style={{ borderRadius: `${imageSettings.borderRadius}%` }}
                 src={selectedImage}

@@ -16,6 +16,12 @@
       box-sizing: border-box;
       overflow-y: scroll;
 
+      .setting-label {
+        border-left: 2px dashed rgb(248, 113, 113);
+        padding-left: 10px;
+        margin-bottom: 10px;
+      }
+
       &::-webkit-scrollbar {
         width: 5px;
       }
@@ -29,16 +35,24 @@
         outline: 1px solid slategrey;
       }
 
+      .setting-section-name {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        font-size: 22px;
+        font-weight: 600;
+        margin-bottom: 25px;
+      }
+
       .setting-section-body {
         margin-bottom: 40px;
-        /* border: 1px solid red; */
+        padding-left: 20px;
       }
 
       .label-settings {
         .label-settings-body {
           display: flex;
           flex-direction: column;
-          gap: 10px;
           padding-left: 10px;
           overflow: hidden;
           max-height: 170px;
@@ -125,9 +139,7 @@
       position: relative;
       display: inline-block;
       padding: var(--padding);
-      background-color: white;
       box-sizing: border-box;
-      color: rgba(60, 60, 63, 0.45);
 
       img {
         max-width: calc(60vw - var(--padding) * 2);
