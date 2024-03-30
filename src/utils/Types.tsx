@@ -33,6 +33,7 @@ export interface ImageSettings {
 }
 
 export interface FrameSettings {
+  size: number;
   backgroundColor: string;
   textColor: string;
 }

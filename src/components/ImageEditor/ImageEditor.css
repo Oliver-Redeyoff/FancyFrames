@@ -132,18 +132,20 @@
     }
 
     .fancy-image {
-      --fancy-image-width: 100px;
-      --fancy-image-height: 100px;
       --padding: 50px;
       --label-height: 20px;
-      position: relative;
       display: inline-block;
+      position: relative;
       padding: var(--padding);
       box-sizing: border-box;
 
-      img {
+      &:not(.downloading) img {
         max-width: calc(60vw - var(--padding) * 2);
         max-height: calc(80vh - var(--padding) * 2);
+      }
+      &.downloading img {
+        max-width: 1000000px;
+        max-height: 1000000px;
       }
 
       .label {
@@ -155,13 +157,14 @@
         transition: all 0.2s;
         justify-content: start;
         font-size: calc(var(--label-height) / 1.4);
+        /* border: 1px solid red; */
 
         .icon {
           height: 80%;
 
           svg {
             height: 100%;
-            stroke-width: 2.5px;
+            stroke-width: 1.7px;
           }
         }
 
@@ -173,7 +176,7 @@
         }
         &.left,
         &.right {
-          width: calc(var(--fancy-image-height) - var(--padding) * 2);
+          width: calc(100% - var(--padding) * 2);
           height: var(--label-height);
         }
 

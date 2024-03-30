@@ -17,6 +17,7 @@ import {
   ChevronDownIcon,
   XMarkIcon,
   TagIcon,
+  AdjustmentsVerticalIcon,
 } from "@heroicons/react/24/outline";
 
 import {
@@ -39,9 +40,12 @@ const ImageEditor = () => {
   });
 
   const [frameSettings, setFrameSettings] = useState<FrameSettings>({
+    size: 50,
     backgroundColor: "#ffffff",
     textColor: "#A7A7A8",
   });
+
+  const [isDownloading, setIsDownloading] = useState<boolean>(false)
 
   const [labelSettings, setLabelSettings] = useState<{
     top: LabelInfo;
@@ -69,37 +73,10 @@ const ImageEditor = () => {
   useEffect(() => {
     console.log(imageInfo);
   }, [imageInfo]);
-
+  
   useEffect(() => {
-    if (fancyImageRef.current) {
-      console.log(fancyImageRef.current.style);
-      fancyImageRef.current.style.setProperty(
-        "--fancy-image-height",
-        fancyImageRef.current?.clientHeight + "px"
-      );
-      fancyImageRef.current.style.setProperty(
-        "--fancy-image-width",
-        fancyImageRef.current?.clientWidth + "px"
-      );
-    }
-  }, [fancyImageRef.current?.clientHeight]);
-
-  function downloadFancyImage() {
-    if (fancyImageRef != null) {
-      console.log(EXIF.getAllTags(selectedImage));
-
-      toPng(fancyImageRef.current as HTMLElement, { cacheBust: false })
-        .then((dataUrl) => {
-          const link = document.createElement("a");
-          link.download = "my-image-name.png";
-          link.href = dataUrl;
-          link.click();
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
-  }
+    fancyImageRef.current?.style.setProperty("--padding", frameSettings.size + "px")
+  }, [frameSettings.size, fancyImageRef.current])
 
   function handleFileInput(event: React.ChangeEvent<HTMLInputElement>) {
     if (event.target.files && event.target.files[0]) {
@@ -153,6 +130,57 @@ const ImageEditor = () => {
     }
   }
 
+  async function downloadFancyImage() {
+    if (fancyImageRef.current) {
+      console.log(EXIF.getAllTags(selectedImage));
+
+      // get old padding and label height
+      const computedStyles = getComputedStyle(fancyImageRef.current)
+      console.log(computedStyles.getPropertyValue("--label-height"))
+      const smallPadding = parseInt(computedStyles.getPropertyValue("--padding"))
+      const smallLabelHeight = parseInt(computedStyles.getPropertyValue("--label-height"))
+
+      const smallHypot = Math.hypot(fancyImageRef.current?.clientWidth ?? 0, fancyImageRef.current?.clientHeight ?? 0)
+      setIsDownloading(true);
+      await new Promise(resolve => setTimeout(resolve, 500));
+      const bigHypot = Math.hypot(fancyImageRef.current?.clientWidth ?? 0, fancyImageRef.current?.clientHeight ?? 0)
+      console.log(bigHypot)
+
+      console.log((smallPadding as number * bigHypot/smallHypot))
+      console.log((smallLabelHeight as number * bigHypot/smallHypot))
+
+      // update size of padding and label height
+      fancyImageRef.current.style.setProperty(
+        "--padding",
+        (smallPadding as number * bigHypot/smallHypot) + "px"
+      );
+      fancyImageRef.current.style.setProperty(
+        "--label-height",
+        (smallLabelHeight as number * bigHypot/smallHypot) + "px"
+      );
+      
+      await new Promise(resolve => setTimeout(resolve, 500));
+      // convert to image
+      toPng(fancyImageRef.current as HTMLElement, { cacheBust: false })
+        .then((dataUrl) => {
+          const link = document.createElement("a");
+          link.download = "my-image-name.png";
+          link.href = dataUrl;
+          link.click();
+          setIsDownloading(false);
+
+          // reset size of padding and label height
+          if (fancyImageRef.current) {
+            fancyImageRef.current.style.setProperty("--padding", smallPadding + "px");
+            fancyImageRef.current.style.setProperty("--label-height", smallLabelHeight + "px");
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  }
+
   return (
     <div className="image-editor bg-neutral-900 font-sans">
       {/* SETTINGS */}
@@ -196,6 +224,21 @@ const ImageEditor = () => {
             Frame settings
           </h2>
           <div className="setting-section-body">
+            <div className="setting-label">Image frame size</div>
+            <input
+              className="w-full"
+              type="range"
+              min="30"
+              max="100"
+              value={frameSettings.size}
+              onChange={(e) => {
+                setFrameSettings({
+                  ...frameSettings,
+                  size: parseInt(e.target.value),
+                });
+              }}
+            />
+
             <div className="setting-label">Frame background color</div>
             <input
               className="w-full bg-transparent"
@@ -327,6 +370,16 @@ const ImageEditor = () => {
               </div>
             ))}
           </div>
+
+          <h2 className="setting-section-name">
+            <div className="w-6">
+              <AdjustmentsVerticalIcon />
+            </div>
+            Tag values
+          </h2>
+          <div className="setting-section-body">
+            {/* Allow user to overide what the value of a tag is */}
+          </div>
         </div>
       </div>
 
@@ -366,7 +419,7 @@ const ImageEditor = () => {
 
             <div
               ref={fancyImageRef}
-              className="fancy-image"
+              className={"fancy-image" + (isDownloading ? " downloading" : "")}
               style={{
                 backgroundColor: frameSettings.backgroundColor,
                 color: frameSettings.textColor,
