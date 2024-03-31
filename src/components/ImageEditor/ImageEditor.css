@@ -5,6 +5,10 @@
   height: 100%;
   align-items: stretch;
 
+  input {
+    color: black;
+  }
+
   .settings-container {
     position: relative;
     width: 300px;
@@ -151,7 +155,7 @@
       .label {
         position: absolute;
         display: flex;
-        gap: 10px;
+        gap: calc(var(--label-height) / 1.5);
         align-items: center;
         box-sizing: border-box;
         transition: all 0.2s;

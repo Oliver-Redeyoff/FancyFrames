@@ -1,13 +1,18 @@
+export interface ImageInfoValue<T> {
+  originalValue: T
+  overideValue?: string
+}
+
 export interface ImageInfo {
-  label: string;
-  cameraMake: string;
-  cameraModel: string;
-  shutterSpeed: string;
-  aperture: number;
-  ISO: number;
-  date: moment.Moment;
-  latitude: string;
-  longitude: string;
+  label: ImageInfoValue<string>;
+  cameraMake: ImageInfoValue<string>;
+  cameraModel: ImageInfoValue<string>;
+  shutterSpeed: ImageInfoValue<string>;
+  aperture: ImageInfoValue<number>;
+  ISO: ImageInfoValue<number>;
+  date: ImageInfoValue<moment.Moment>;
+  latitude: ImageInfoValue<string>;
+  longitude: ImageInfoValue<string>;
 }
 
 export interface TagInfo {

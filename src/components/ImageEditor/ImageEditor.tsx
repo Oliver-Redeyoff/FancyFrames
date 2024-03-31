@@ -26,8 +26,9 @@ import {
   Tags,
   ImageSettings,
   FrameSettings,
+  ImageInfoValue,
 } from "../../utils/Types";
-import { GetTags } from "../../utils/TagData";
+import { GetLabels, GetInfoValue } from "../../utils/TagData";
 
 const ImageEditor = () => {
   const fancyImageRef = useRef<HTMLDivElement>(null);
@@ -35,29 +36,6 @@ const ImageEditor = () => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [imageInfo, setImageInfo] = useState<ImageInfo>({} as ImageInfo);
 
-  const [imageSettings, setImageSettings] = useState<ImageSettings>({
-    borderRadius: 0,
-  });
-
-  const [frameSettings, setFrameSettings] = useState<FrameSettings>({
-    size: 50,
-    backgroundColor: "#ffffff",
-    textColor: "#A7A7A8",
-  });
-
-  const [isDownloading, setIsDownloading] = useState<boolean>(false)
-
-  const [labelSettings, setLabelSettings] = useState<{
-    top: LabelInfo;
-    right: LabelInfo;
-    bottom: LabelInfo;
-    left: LabelInfo;
-  }>({
-    top: { type: "Camera", alignment: "start" },
-    right: { type: "Date", alignment: "start" },
-    bottom: { type: "Title", alignment: "start" },
-    left: { type: "Coordinates", alignment: "start" },
-  });
   const [labelSettingsCollapsed, setLabelSettingsCollapsed] = useState<{
     top: boolean;
     right: boolean;
@@ -69,11 +47,32 @@ const ImageEditor = () => {
     bottom: true,
     left: true,
   });
+  const [isDownloading, setIsDownloading] = useState<boolean>(false)
+
+  const [imageSettings, setImageSettings] = useState<ImageSettings>({
+    borderRadius: 0,
+  });
+  const [frameSettings, setFrameSettings] = useState<FrameSettings>({
+    size: 50,
+    backgroundColor: "#ffffff",
+    textColor: "#A7A7A8",
+  });
+  const [labelSettings, setLabelSettings] = useState<{
+    top: LabelInfo;
+    right: LabelInfo;
+    bottom: LabelInfo;
+    left: LabelInfo;
+  }>({
+    top: { type: "Camera", alignment: "start" },
+    right: { type: "Date", alignment: "start" },
+    bottom: { type: "Title", alignment: "start" },
+    left: { type: "Coordinates", alignment: "start" },
+  });
 
   useEffect(() => {
     console.log(imageInfo);
   }, [imageInfo]);
-  
+
   useEffect(() => {
     fancyImageRef.current?.style.setProperty("--padding", frameSettings.size + "px")
   }, [frameSettings.size, fancyImageRef.current])
@@ -111,16 +110,22 @@ const ImageEditor = () => {
               longitude = `${longitudeCoords[0]}° ${longitudeCoords[1]}' ${longitudeCoords[2]}" ${exifData["GPSLatitudeRef"]}`;
             }
 
+            const createImageInfoValue = (value: any): ImageInfoValue<typeof value> => {
+              return {
+                originalValue: value
+              }
+            }
+
             setImageInfo({
-              label: exifData["ImageDescription"],
-              cameraMake: exifData["Make"],
-              cameraModel: exifData["Model"],
-              aperture: exifData["FNumber"]?.numerator,
-              shutterSpeed: shutterSpeed,
-              ISO: exifData["ISOSpeedRatings"],
-              date: moment(exifData["DateTime"], "YYYY:MM:DD hh:mm:ss"),
-              latitude: latitude,
-              longitude: longitude,
+              label: createImageInfoValue(exifData["ImageDescription"]),
+              cameraMake: createImageInfoValue(exifData["Make"]),
+              cameraModel: createImageInfoValue(exifData["Model"]),
+              aperture: createImageInfoValue(exifData["FNumber"]?.numerator),
+              shutterSpeed: createImageInfoValue(shutterSpeed),
+              ISO: createImageInfoValue(exifData["ISOSpeedRatings"]),
+              date: createImageInfoValue(moment(exifData["DateTime"], "YYYY:MM:DD hh:mm:ss")),
+              latitude: createImageInfoValue(latitude),
+              longitude: createImageInfoValue(longitude),
             });
           } else {
             console.log("No EXIF data found in image '" + file.name + "'.");
@@ -333,7 +338,7 @@ const ImageEditor = () => {
                         setLabelSettings(newDetails);
                       }}
                     >
-                      {Object.keys(GetTags(imageInfo)).map((tagType) => (
+                      {Object.keys(GetLabels(imageInfo)).map((tagType) => (
                         <option value={tagType}>{tagType}</option>
                       ))}
                     </select>
@@ -379,6 +384,25 @@ const ImageEditor = () => {
           </h2>
           <div className="setting-section-body">
             {/* Allow user to overide what the value of a tag is */}
+            {Object.keys(imageInfo).map((key) => (
+              <div>
+                <div className="setting-label">{key}</div>
+                <div className="pl-1">
+                  <div className="setting-label">Original value</div>
+                  <div>{GetInfoValue(imageInfo[key as keyof ImageInfo], "originalValue")}</div>
+                  <div className="setting-label">Overide value</div>
+                  <div>
+                    <input 
+                      value={imageInfo[key as keyof ImageInfo].overideValue}
+                      onChange={(e) => {
+                        let newImageInfo = {...imageInfo}
+                        newImageInfo[key as keyof ImageInfo].overideValue = e.target.value
+                        setImageInfo(newImageInfo)
+                      }} />
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -442,13 +466,13 @@ const ImageEditor = () => {
                 >
                   <div className="icon ">
                     {
-                      GetTags(imageInfo)[
+                      GetLabels(imageInfo)[
                         labelSettings[position as keyof typeof labelSettings]
                           .type
                       ].icon
                     }
                   </div>
-                  {GetTags(imageInfo)[
+                  {GetLabels(imageInfo)[
                     labelSettings[position as keyof typeof labelSettings].type
                   ].content.map((element) => element)}
                 </div>
