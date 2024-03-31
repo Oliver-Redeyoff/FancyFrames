@@ -45,18 +45,24 @@ export function GetLabels(imageInfo: ImageInfo) {
           {GetInfoValue(imageInfo.cameraMake)} {GetInfoValue(imageInfo.cameraModel)}
         </span>,
         <div style={{ width: "10px" }} />,
-        <span>
-          <span className="setting">SS </span>
-          {GetInfoValue(imageInfo.shutterSpeed)}
-        </span>,
-        <span>
-          <span className="setting">A </span>
-          {GetInfoValue(imageInfo.aperture)}
-        </span>,
-        <span>
-          <span className="setting">ISO </span>
-          {GetInfoValue(imageInfo.ISO)}
-        </span>,
+        <>
+          {GetInfoValue(imageInfo.shutterSpeed) && <span>
+            <span className="setting">SS </span>
+            {GetInfoValue(imageInfo.shutterSpeed)}
+          </span>}
+        </>,
+        <>
+          {GetInfoValue(imageInfo.aperture) && <span>
+            <span className="setting">A </span>
+            {GetInfoValue(imageInfo.aperture)}
+          </span>}
+        </>,
+        <>
+          {GetInfoValue(imageInfo.ISO) && <span>
+            <span className="setting">ISO </span>
+            {GetInfoValue(imageInfo.ISO)}
+          </span>}
+        </>,
       ],
     },
     Date: {

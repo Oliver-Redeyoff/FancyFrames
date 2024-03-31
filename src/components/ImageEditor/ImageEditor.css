@@ -142,6 +142,7 @@
       position: relative;
       padding: var(--padding);
       box-sizing: border-box;
+      overflow: hidden;
 
       &:not(.downloading) img {
         max-width: calc(60vw - var(--padding) * 2);

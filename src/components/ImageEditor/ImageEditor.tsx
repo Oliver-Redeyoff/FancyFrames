@@ -1,7 +1,7 @@
 import "./ImageEditor.css";
 
 import { useState, useRef, useEffect } from "react";
-import { toPng } from "html-to-image";
+import { toJpeg } from "html-to-image";
 import EXIF from "exif-js";
 import moment from "moment";
 
@@ -54,6 +54,7 @@ const ImageEditor = () => {
   });
   const [frameSettings, setFrameSettings] = useState<FrameSettings>({
     size: 50,
+    labelHeight: 30,
     backgroundColor: "#ffffff",
     textColor: "#A7A7A8",
   });
@@ -75,7 +76,8 @@ const ImageEditor = () => {
 
   useEffect(() => {
     fancyImageRef.current?.style.setProperty("--padding", frameSettings.size + "px")
-  }, [frameSettings.size, fancyImageRef.current])
+    fancyImageRef.current?.style.setProperty("--label-height", frameSettings.labelHeight + "px")
+  }, [frameSettings.size, frameSettings.labelHeight, fancyImageRef.current])
 
   function handleFileInput(event: React.ChangeEvent<HTMLInputElement>) {
     if (event.target.files && event.target.files[0]) {
@@ -166,7 +168,7 @@ const ImageEditor = () => {
       
       await new Promise(resolve => setTimeout(resolve, 500));
       // convert to image
-      toPng(fancyImageRef.current as HTMLElement, { cacheBust: false })
+      toJpeg(fancyImageRef.current as HTMLElement, { quality: 0.95 })
         .then((dataUrl) => {
           const link = document.createElement("a");
           link.download = "my-image-name.png";
@@ -229,17 +231,32 @@ const ImageEditor = () => {
             Frame settings
           </h2>
           <div className="setting-section-body">
-            <div className="setting-label">Image frame size</div>
+            <div className="setting-label">Frame size</div>
             <input
               className="w-full"
               type="range"
-              min="30"
+              min="10"
               max="100"
               value={frameSettings.size}
               onChange={(e) => {
                 setFrameSettings({
                   ...frameSettings,
                   size: parseInt(e.target.value),
+                });
+              }}
+            />
+
+            <div className="setting-label">Frame text size</div>
+            <input
+              className="w-full"
+              type="range"
+              min="10"
+              max="50"
+              value={frameSettings.labelHeight}
+              onChange={(e) => {
+                setFrameSettings({
+                  ...frameSettings,
+                  labelHeight: parseInt(e.target.value),
                 });
               }}
             />
@@ -375,7 +392,8 @@ const ImageEditor = () => {
               </div>
             ))}
           </div>
-
+          
+          {/* TAG VALUES */}
           <h2 className="setting-section-name">
             <div className="w-6">
               <AdjustmentsVerticalIcon />
@@ -387,10 +405,10 @@ const ImageEditor = () => {
             {Object.keys(imageInfo).map((key) => (
               <div>
                 <div className="setting-label">{key}</div>
-                <div className="pl-1">
+                <div className="pl-3 pb-4">
                   <div className="setting-label">Original value</div>
-                  <div>{GetInfoValue(imageInfo[key as keyof ImageInfo], "originalValue")}</div>
-                  <div className="setting-label">override value</div>
+                  <div>{GetInfoValue(imageInfo[key as keyof ImageInfo], "originalValue") ?? "test"}</div>
+                  <div className="setting-label">Override value</div>
                   <div>
                     <input 
                       value={imageInfo[key as keyof ImageInfo].overrideValue}
