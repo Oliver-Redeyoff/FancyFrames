@@ -383,20 +383,20 @@ const ImageEditor = () => {
             Tag values
           </h2>
           <div className="setting-section-body">
-            {/* Allow user to overide what the value of a tag is */}
+            {/* Allow user to override what the value of a tag is */}
             {Object.keys(imageInfo).map((key) => (
               <div>
                 <div className="setting-label">{key}</div>
                 <div className="pl-1">
                   <div className="setting-label">Original value</div>
                   <div>{GetInfoValue(imageInfo[key as keyof ImageInfo], "originalValue")}</div>
-                  <div className="setting-label">Overide value</div>
+                  <div className="setting-label">override value</div>
                   <div>
                     <input 
-                      value={imageInfo[key as keyof ImageInfo].overideValue}
+                      value={imageInfo[key as keyof ImageInfo].overrideValue}
                       onChange={(e) => {
                         let newImageInfo = {...imageInfo}
-                        newImageInfo[key as keyof ImageInfo].overideValue = e.target.value
+                        newImageInfo[key as keyof ImageInfo].overrideValue = e.target.value
                         setImageInfo(newImageInfo)
                       }} />
                   </div>

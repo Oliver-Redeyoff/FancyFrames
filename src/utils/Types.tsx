@@ -1,6 +1,6 @@
 export interface ImageInfoValue<T> {
   originalValue: T
-  overideValue?: string
+  overrideValue?: string
 }
 
 export interface ImageInfo {

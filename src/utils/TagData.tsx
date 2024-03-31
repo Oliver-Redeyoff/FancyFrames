@@ -25,8 +25,8 @@ export function GetInfoValue(imageInfoValue: ImageInfoValue<any>, valueType?: ke
     return processValue(valueType)
   }
 
-  if (imageInfoValue.overideValue) {
-    return processValue("overideValue")
+  if (imageInfoValue.overrideValue) {
+    return processValue("overrideValue")
   } else {
     return processValue("originalValue")
   }
