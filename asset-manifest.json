@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/FancyFrames/static/css/main.d69bfaf3.css",
+    "main.js": "/FancyFrames/static/js/main.96375d5e.js",
+    "index.html": "/FancyFrames/index.html",
+    "main.d69bfaf3.css.map": "/FancyFrames/static/css/main.d69bfaf3.css.map",
+    "main.96375d5e.js.map": "/FancyFrames/static/js/main.96375d5e.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.d69bfaf3.css",
+    "static/js/main.96375d5e.js"
+  ]
+}
